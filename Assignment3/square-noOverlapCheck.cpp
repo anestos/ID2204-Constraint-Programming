@@ -96,10 +96,10 @@ public:
                     
                     // If j overlaps with i return failure
                     // otherwise the values that conflict are removed.
-                    if (    me_failed(x[j].gq(home, x[i].val()+w[i]))
-                        &&  me_failed(y[j].gq(home, y[i].val()+h[i]))
-                        &&  me_failed(x[j].lq(home, x[i].val()-w[j]))
-                        &&  me_failed(y[j].lq(home, y[i].val()-h[j]))) {
+                    if (    me_failed(x[j].lq(home, x[i].val()-w[j]))
+                        &&  me_failed(x[j].gq(home, x[i].val()+w[i]))
+                        &&  me_failed(y[j].lq(home, y[i].val()-h[j]))
+                        &&  me_failed(y[j].gq(home, y[i].val()+h[i]))) {
                         return ES_FAILED;
                     }
                 }
