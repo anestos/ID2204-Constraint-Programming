@@ -1,11 +1,3 @@
-//
-//  Queens.cpp
-//  A1
-//
-//  Created by Lorenzo Corneo on 08/04/15.
-//  Copyright (c) 2015 Lorenzo Corneo. All rights reserved.
-//
-
 #include <gecode/driver.hh>
 #include <gecode/int.hh>
 #include <gecode/minimodel.hh>
