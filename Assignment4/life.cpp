@@ -6,7 +6,7 @@ using namespace Gecode;
 
 class Life : public Script {
 public:
-    /// Size
+
     BoolVarArray q;
     
     /// The actual problem
@@ -26,7 +26,7 @@ public:
         }
         
         // we start on the inner row of the border.
-        // the outer will never change if the inner doesn't change
+        // the outer will never change since the inner doesn't change
         for (int i =1; i<n-1; i++){
             for (int j = 1; j < n-1; j++) {
                 BoolVarArray neighbours(*this, 8);
@@ -41,12 +41,12 @@ public:
                     }
                 }
                 // the sum of neighbours of a cell
-                IntVar sumOfAliveNeighbours(*this, 0, 8);
-                rel(*this, sum(neighbours) == sumOfAliveNeighbours);
+                IntVar neighbourSum(*this, 0, 8);
+                rel(*this, sum(neighbours) == neighbourSum);
                 // if the cell is alive it must have 2 or 3 alive neighbours
-                rel(*this, board(i,j) >> (sumOfAliveNeighbours==2 || sumOfAliveNeighbours==3));
+                rel(*this, board(i,j) >> (neighbourSum==2 || neighbourSum==3));
                 // if the cell is dead it cannot have 3 neighbours
-                rel(*this, !board(i,j) >> (sumOfAliveNeighbours !=3));
+                rel(*this, !board(i,j) >> (neighbourSum !=3));
            
             }
             
@@ -110,14 +110,177 @@ int main(int argc, char* argv[]) {
     Script::run<Life,BAB,SizeOptions>(opt);
     return 0;
     
-    
-//    SizeOptions opt("Life");
-//    opt.size(8);
-//    Life* m = new Life(opt);
-//    BAB<Life> e(m);
-//    delete m;
-//    while (Life* s = e.next()) {
-//        s->print(); delete s;
-//    }
-//    return 0;
 }
+// Output for size 8 and 9:
+//  Please enter the number of size of board
+//  8
+//  Life
+//  0	0	0	0	0	0	0	0	0	0	0	0
+//  0	0	0	0	0	0	0	0	0	0	0	0
+//  0	0	1	1	0	1	1	0	1	1	0	0
+//  0	0	1	1	0	1	1	0	1	1	0	0
+//  0	0	0	0	0	0	0	0	0	0	0	0
+//  0	0	1	1	1	1	1	1	1	1	0	0
+//  0	0	1	0	0	1	0	0	0	1	0	0
+//  0	0	0	1	0	0	0	1	1	0	0	0
+//  0	0	0	0	1	1	1	0	0	0	0	0
+//  0	0	0	0	0	0	1	0	0	0	0	0
+//  0	0	0	0	0	0	0	0	0	0	0	0
+//  0	0	0	0	0	0	0	0	0	0	0	0
+//  Number of Alive:30
+//
+//  0	0	0	0	0	0	0	0	0	0	0	0
+//  0	0	0	0	0	0	0	0	0	0	0	0
+//  0	0	1	1	0	1	1	0	1	1	0	0
+//  0	0	1	1	0	1	1	0	1	1	0	0
+//  0	0	0	0	0	0	0	0	0	0	0	0
+//  0	0	1	1	1	1	1	1	1	1	0	0
+//  0	0	1	0	0	0	0	0	0	1	0	0
+//  0	0	0	1	0	1	1	0	1	0	0	0
+//  0	0	1	1	0	1	1	0	1	1	0	0
+//  0	0	0	0	0	0	0	0	0	0	0	0
+//  0	0	0	0	0	0	0	0	0	0	0	0
+//  0	0	0	0	0	0	0	0	0	0	0	0
+//  Number of Alive:32
+//
+//  0	0	0	0	0	0	0	0	0	0	0	0
+//  0	0	0	0	0	0	0	0	0	0	0	0
+//  0	0	1	1	0	1	1	0	1	1	0	0
+//  0	0	1	1	0	1	1	0	1	1	0	0
+//  0	0	0	0	0	0	0	0	0	0	0	0
+//  0	0	1	1	1	1	1	1	1	1	0	0
+//  0	0	1	0	0	0	0	0	0	1	0	0
+//  0	0	0	0	1	1	1	1	0	0	0	0
+//  0	0	1	0	1	0	0	1	0	1	0	0
+//  0	0	1	1	0	0	0	0	1	1	0	0
+//  0	0	0	0	0	0	0	0	0	0	0	0
+//  0	0	0	0	0	0	0	0	0	0	0	0
+//  Number of Alive:34
+//
+//  0	0	0	0	0	0	0	0	0	0	0	0
+//  0	0	0	0	0	0	0	0	0	0	0	0
+//  0	0	1	1	0	1	1	0	1	1	0	0
+//  0	0	1	1	0	1	1	0	1	1	0	0
+//  0	0	0	0	0	0	0	0	0	0	0	0
+//  0	0	1	1	0	1	1	0	1	1	0	0
+//  0	0	1	1	0	1	1	0	1	1	0	0
+//  0	0	0	0	0	0	0	0	0	0	0	0
+//  0	0	1	1	0	1	1	0	1	1	0	0
+//  0	0	1	1	0	1	1	0	1	1	0	0
+//  0	0	0	0	0	0	0	0	0	0	0	0
+//  0	0	0	0	0	0	0	0	0	0	0	0
+//  Number of Alive:36
+//
+//
+//  Initial
+//  propagators: 628
+//  branchers:   1
+//
+//  Summary
+//  runtime:      19.174 (19174.880 ms)
+//  solutions:    4
+//  propagations: 125968051
+//  nodes:        1621477
+//  failures:     810735
+//  restarts:     0
+//  no-goods:     0
+//  peak depth:   34
+//
+//  Program ended with exit code: 0
+
+
+
+//  Please enter the number of size of board
+//  9
+//  Life
+//  0	0	0	0	0	0	0	0	0	0	0	0	0
+//  0	0	0	0	0	0	0	0	0	0	0	0	0
+//  0	0	1	1	0	1	1	0	1	1	0	0	0
+//  0	0	1	1	0	1	1	0	1	1	0	0	0
+//  0	0	0	0	0	0	0	0	0	0	0	0	0
+//  0	0	1	1	1	1	1	1	1	1	0	0	0
+//  0	0	1	0	0	1	0	0	1	0	1	0	0
+//  0	0	0	1	0	0	0	0	0	0	1	0	0
+//  0	0	0	0	1	1	1	1	1	1	0	0	0
+//  0	0	1	0	1	0	0	1	0	0	0	0	0
+//  0	0	1	1	0	0	0	0	0	0	0	0	0
+//  0	0	0	0	0	0	0	0	0	0	0	0	0
+//  0	0	0	0	0	0	0	0	0	0	0	0	0
+//  Number of Alive:37
+//
+//  0	0	0	0	0	0	0	0	0	0	0	0	0
+//  0	0	0	0	0	0	0	0	0	0	0	0	0
+//  0	0	1	1	0	1	1	0	1	1	0	0	0
+//  0	0	1	1	0	1	1	0	1	1	0	0	0
+//  0	0	0	0	0	0	0	0	0	0	0	0	0
+//  0	0	1	1	1	1	1	1	1	1	0	0	0
+//  0	0	1	0	0	1	0	0	0	1	0	0	0
+//  0	0	0	1	0	0	0	1	1	0	0	0	0
+//  0	0	0	0	1	1	1	0	0	0	0	0	0
+//  0	0	1	0	1	0	0	1	1	1	1	0	0
+//  0	0	1	1	0	0	0	1	0	0	1	0	0
+//  0	0	0	0	0	0	0	0	0	0	0	0	0
+//  0	0	0	0	0	0	0	0	0	0	0	0	0
+//  Number of Alive:39
+//
+//  0	0	0	0	0	0	0	0	0	0	0	0	0
+//  0	0	0	0	0	0	0	0	0	0	0	0	0
+//  0	0	1	1	0	1	1	0	1	1	0	0	0
+//  0	0	1	1	0	1	1	0	1	1	0	0	0
+//  0	0	0	0	0	0	0	0	0	0	0	0	0
+//  0	0	1	1	1	1	1	1	1	1	0	0	0
+//  0	0	1	0	0	1	0	0	0	0	1	0	0
+//  0	0	0	1	0	0	0	1	1	1	1	0	0
+//  0	0	0	0	1	1	1	0	0	0	0	0	0
+//  0	0	1	0	1	0	0	1	1	1	1	0	0
+//  0	0	1	1	0	0	0	1	0	0	1	0	0
+//  0	0	0	0	0	0	0	0	0	0	0	0	0
+//  0	0	0	0	0	0	0	0	0	0	0	0	0
+//  Number of Alive:41
+//
+//  0	0	0	0	0	0	0	0	0	0	0	0	0
+//  0	0	0	0	0	0	0	0	0	0	0	0	0
+//  0	0	1	1	0	1	1	0	1	1	0	0	0
+//  0	0	1	1	0	1	1	0	1	1	0	0	0
+//  0	0	0	0	0	0	0	0	0	0	0	0	0
+//  0	0	1	1	1	1	1	1	1	1	0	0	0
+//  0	0	1	0	0	1	0	0	0	0	1	0	0
+//  0	0	0	1	0	0	0	1	1	1	1	0	0
+//  0	0	0	0	1	1	1	0	0	0	0	0	0
+//  0	0	1	0	1	0	0	1	0	1	1	0	0
+//  0	0	1	1	0	0	1	1	0	1	1	0	0
+//  0	0	0	0	0	0	0	0	0	0	0	0	0
+//  0	0	0	0	0	0	0	0	0	0	0	0	0
+//  Number of Alive:42
+//
+//  0	0	0	0	0	0	0	0	0	0	0	0	0
+//  0	0	0	0	0	0	0	0	0	0	0	0	0
+//  0	0	1	1	0	1	1	0	1	1	0	0	0
+//  0	0	1	0	1	1	0	1	1	0	1	0	0
+//  0	0	0	0	0	0	0	0	0	0	1	0	0
+//  0	0	0	1	1	1	1	1	0	1	0	0	0
+//  0	0	1	0	0	0	0	1	0	1	1	0	0
+//  0	0	1	1	1	1	0	1	0	0	1	0	0
+//  0	0	0	0	0	1	0	1	1	0	0	0	0
+//  0	0	1	1	0	1	0	0	1	0	1	0	0
+//  0	0	1	1	0	1	1	0	0	1	1	0	0
+//  0	0	0	0	0	0	0	0	0	0	0	0	0
+//  0	0	0	0	0	0	0	0	0	0	0	0	0
+//  Number of Alive:43
+//
+//
+//  Initial
+//  propagators: 767
+//  branchers:   1
+//
+//  Summary
+//  runtime:      25:40.261 (1540261.873 ms)
+//  solutions:    5
+//  propagations: 10151041224
+//  nodes:        127248313
+//  failures:     63624152
+//  restarts:     0
+//  no-goods:     0
+//  peak depth:   48
+//
+//  Program ended with exit code: 0

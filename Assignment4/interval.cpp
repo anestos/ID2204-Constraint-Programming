@@ -60,8 +60,8 @@ protected:
     /* Initialize description for brancher b, number of
      *  alternatives a, position p, and ???.
      */
-    Description(const Brancher& b, unsigned int a, int p, int newx1, int newx2)
-      : Choice(b,a), pos(p), intrlvS(newx1), intrlvE(newx2) {}
+    Description(const Brancher& b, unsigned int a, int p, int intervalStart, int intervalEnd)
+      : Choice(b,a), pos(p), intrlvS(intervalStart), intrlvE(intervalEnd) {}
     // Report size occupied
     virtual size_t size(void) const {
       return sizeof(Description);
@@ -101,14 +101,10 @@ public:
 
     // FILL IN HERE
       for (int i=start; i<x.size(); i++){
-          if (!x[i].assigned()){
-          int g1 = x[i].min() + w[i];
-          int g2 = x[i].max();
-          int th = ceil(w[i]*p);
-          std::cout << "square " << i << "[" << g2<< ".." << g1 << "]" << th << x[i] << x[i].size() << std::endl;
 
-              if (abs(g1-g2) > th && x[i].size() >= th){
-                  std::cout << "inside if" << std::endl;
+          if (!x[i].assigned()){
+          // we can split the x[i] when min+width-obligatoryPart < max
+              if (x[i].min() + w[i] - ceil(w[i]*p) < x[i].max()){
                   start = i;
                   return true;
               }
@@ -119,9 +115,9 @@ public:
   // Return choice as description
   virtual Choice* choice(Space& home) {
     // FILL IN HERE
-      int str = x[start].min();
-      int end = floor(w[start]*p) + x[start].min();
-      return new Description(*this, 2, start, str, end);
+      int instart = x[start].min();
+      int inend =  x[start].min() + w[start] - ceil(w[start]*p);
+      return new Description(*this, 2, start, instart, inend);
   }
   // Construct choice from archive e
   virtual const Choice* choice(const Space&, Archive& e) {
@@ -140,20 +136,19 @@ public:
       int pos = d.pos;
       int smallest = d.intrlvS;
       int largest = d.intrlvE;
-      std::cout << "1!!" <<"square" << start << "[" << smallest<< ".." << largest << "]" << x[pos]<< std::endl;
-
-
+      
+      // when it is the first choice, we check if the largest value to force the obligatory part is inside x[pos].
+      // if it is not inside x[pos], this means that using x[pos].lq(home, largest), the output will have a larger obligatory part
+      // and we avoid that by returning failed, forcing the second choice
       if (a == 0){
-          if (!me_modified(x[pos].lq(home, largest))){
-              std::cout << "failed" << std::endl;
-              return ES_FAILED;
+          if (x[pos].in(largest)){
+              return me_failed(x[pos].lq(home, largest)) ? ES_FAILED : ES_OK;
           } else {
-              std::cout << "2!!square " << pos << "[" << smallest<< ".." << largest << "]" << x[pos] << std::endl;
-              return ES_OK;
+              return ES_FAILED;
           }
       }
+      // The second choice removes the smallest value of the store
       else {
-          std::cout << "else" << std::endl;
           return me_failed(x[pos].gq(home,smallest+1)) ? ES_FAILED : ES_OK;
       }
       
@@ -167,9 +162,9 @@ public:
       const Description& pv = static_cast<const Description&>(c);
       int pos = pv.pos;
       if (b == 0)
-        std::cout << "x[" << pos << "] = " << pv.intrlvS << ".." << pv.intrlvE;
+        o << "x[" << pos << "] = " << pv.intrlvS << ".." << pv.intrlvE;
       else
-          std::cout << "x[" << pos << "] != " << pv.intrlvS << ".." << pv.intrlvE;;
+        o << "x[" << pos << "] >= " << pv.intrlvS+1;
   }
 };
 
